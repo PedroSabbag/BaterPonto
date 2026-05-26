@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bater Ponto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F4F1EC;
+      --surface: #FFFFFF;
+      --border: #D8D4CC;
+      --text: #1A1814;
+      --muted: #7A776F;
+      --accent: #2D5A3D;
+      --accent-light: #E8F2EC;
+      --amber: #8B5E1A;
+      --amber-light: #FBF1E0;
+      --blue: #1A3A5C;
+      --blue-light: #E0EAF5;
+      --red: #7A1F1F;
+      --red-light: #F5E0E0;
+      --radius: 12px;
+      --mono: 'DM Mono', monospace;
+      --sans: 'DM Sans', sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .app-header {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .app-title {
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    /* Clock */
+    .clock-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    .clock-time {
+      font-family: var(--mono);
+      font-size: 48px;
+      font-weight: 500;
+      color: var(--text);
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+
+    .clock-date {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* Status */
+    .status-card {
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 1rem;
+      font-size: 14px;
+      font-weight: 500;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .status-default { background: #EEEAE2; color: var(--muted); }
+    .status-green  { background: var(--accent-light); color: var(--accent); }
+    .status-amber  { background: var(--amber-light); color: var(--amber); }
+    .status-blue   { background: var(--blue-light); color: var(--blue); }
+    .status-red    { background: var(--red-light); color: var(--red); }
+
+    /* Button */
+    .btn-ponto {
+      width: 100%;
+      padding: 16px;
+      font-family: var(--sans);
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: var(--radius);
+      border: 1.5px solid var(--text);
+      background: var(--text);
+      color: #FFF;
+      cursor: pointer;
+      margin-bottom: 1.25rem;
+      transition: opacity 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-ponto:hover { opacity: 0.85; }
+    .btn-ponto:active { transform: scale(0.98); }
+    .btn-ponto:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+
+    /* Registros */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .registro-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      animation: fadeIn 0.25s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .reg-left { display: flex; flex-direction: column; gap: 2px; }
+    .reg-label-text {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .reg-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-green { background: var(--accent); }
+    .dot-amber { background: #C88020; }
+    .dot-blue  { background: #2255A0; }
+    .dot-red   { background: var(--red); }
+
+    .reg-hint { font-size: 12px; color: var(--muted); padding-left: 13px; }
+
+    .reg-hora {
+      font-family: var(--mono);
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* Total */
+    .total-card {
+      background: var(--text);
+      color: #FFF;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+    .total-label { font-size: 13px; opacity: 0.7; }
+    .total-value { font-family: var(--mono); font-size: 20px; font-weight: 500; }
+
+    /* Reset */
+    .btn-reset {
+      width: 100%;
+      padding: 10px;
+      font-family: var(--sans);
+      font-size: 13px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      margin-top: 10px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .btn-reset:hover { color: var(--red); border-color: var(--red); }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="app-header">
+    <div class="app-title">Controle de Ponto</div>
+  </div>
+
+  <div class="clock-card">
+    <div class="clock-time" id="clock">--:--:--</div>
+    <div class="clock-date" id="date-label">--</div>
+  </div>
+
+  <div class="status-card status-default" id="status-msg">Pronto para registrar a entrada.</div>
+
+  <button class="btn-ponto" id="btn-ponto" onclick="baterPonto()">
+    &#9679; <span id="btn-label">Bater ponto — Entrada</span>
+  </button>
+
+  <div id="registros-section" style="display:none;">
+    <div class="section-label">Registros do dia</div>
+    <div id="lista-registros"></div>
+    <div id="total-section" style="display:none;">
+      <div class="total-card">
+        <span class="total-label">Total trabalhado</span>
+        <span class="total-value" id="total-horas">--</span>
+      </div>
+    </div>
+    <button class="btn-reset" onclick="resetar()">&#10005; Reiniciar dia</button>
+  </div>
+</div>
+
+<script>
+const PASSOS = [
+  { id:'entrada',  label:'Entrada',         dot:'dot-green' },
+  { id:'almoco',   label:'Saída almoço',    dot:'dot-amber' },
+  { id:'retorno',  label:'Retorno almoço',  dot:'dot-blue'  },
+  { id:'saida',    label:'Saída',           dot:'dot-red'   },
+];
+const ALMOCO_MIN = 15;
+let estado = { passo: 0, registros: {} };
+
+function horarioBrasilia() {
+  return new Date(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+}
+function fmtHM(d) {
+  return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', timeZone:'America/Sao_Paulo' });
+}
+function fmtHMS(d) {
+  return d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit', second:'2-digit', timeZone:'America/Sao_Paulo' });
+}
+function fmtData(d) {
+  return d.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', timeZone:'America/Sao_Paulo' });
+}
+function addMin(d, m) { return new Date(d.getTime() + m * 60000); }
+function diffMin(a, b) { return Math.round((b - a) / 60000); }
+function minToHM(m) {
+  const h = Math.floor(m / 60), min = m % 60;
+  return h > 0 ? `${h}h ${String(min).padStart(2,'0')}min` : `${min}min`;
+}
+
+function tick() {
+  const now = horarioBrasilia();
+  document.getElementById('clock').textContent = fmtHMS(now);
+  document.getElementById('date-label').textContent = fmtData(now);
+}
+
+function setStatus(msg, tipo) {
+  const el = document.getElementById('status-msg');
+  el.className = 'status-card ' + tipo;
+  el.innerHTML = msg;
+}
+
+function baterPonto() {
+  if (estado.passo >= PASSOS.length) return;
+  const now = horarioBrasilia();
+  const passo = PASSOS[estado.passo];
+  estado.registros[passo.id] = now;
+
+  if (passo.id === 'entrada') {
+    setStatus('Entrada registrada às ' + fmtHM(now), 'status-green');
+  } else if (passo.id === 'almoco') {
+    const volta = addMin(now, ALMOCO_MIN);
+    setStatus('Almoço iniciado. Retorne às <strong>' + fmtHM(volta) + '</strong> (' + ALMOCO_MIN + ' min)', 'status-amber');
+  } else if (passo.id === 'retorno') {
+    const dur = diffMin(estado.registros.almoco, now);
+    setStatus('Retorno registrado. Almoço durou ' + dur + ' min.', 'status-blue');
+    calcularPrevisaoSaida();
+  } else if (passo.id === 'saida') {
+    setStatus('Saída registrada. Bom descanso!', 'status-red');
+    document.getElementById('btn-ponto').disabled = true;
+  }
+
+  estado.passo++;
+  renderRegistros();
+  renderBotao();
+}
+
+function calcularPrevisaoSaida() {
+  const reg = estado.registros;
+  const trabManha = diffMin(reg.entrada, reg.almoco);
+  const restante = (8 * 60) - trabManha;
+  const saidaPrev = addMin(reg.retorno, restante);
+  setTimeout(() => {
+    setStatus('Previsão de saída: <strong>' + fmtHM(saidaPrev) + '</strong> (jornada de 8h)', 'status-blue');
+  }, 2000);
+}
+
+function renderBotao() {
+  const btn = document.getElementById('btn-ponto');
+  const lbl = document.getElementById('btn-label');
+  if (estado.passo >= PASSOS.length) {
+    btn.disabled = true;
+    lbl.textContent = 'Dia concluído';
+    return;
+  }
+  lbl.textContent = 'Bater ponto — ' + PASSOS[estado.passo].label;
+}
+
+function renderRegistros() {
+  const sec = document.getElementById('registros-section');
+  const lista = document.getElementById('lista-registros');
+  sec.style.display = 'block';
+  lista.innerHTML = '';
+
+  PASSOS.forEach(p => {
+    if (!estado.registros[p.id]) return;
+    const hora = fmtHM(estado.registros[p.id]);
+    let hint = '';
+    if (p.id === 'almoco') {
+      hint = 'Retornar às ' + fmtHM(addMin(estado.registros.almoco, ALMOCO_MIN));
+    }
+    if (p.id === 'retorno' && estado.registros.almoco) {
+      hint = diffMin(estado.registros.almoco, estado.registros.retorno) + ' min de almoço';
+    }
+
+    const div = document.createElement('div');
+    div.className = 'registro-item';
+    div.innerHTML = `
+      <div class="reg-left">
+        <div class="reg-label-text"><span class="reg-dot ${p.dot}"></span>${p.label}</div>
+        ${hint ? `<div class="reg-hint">${hint}</div>` : ''}
+      </div>
+      <span class="reg-hora">${hora}</span>
+    `;
+    lista.appendChild(div);
+  });
+
+  if (estado.passo >= 4) {
+    const reg = estado.registros;
+    const total = diffMin(reg.entrada, reg.almoco) + diffMin(reg.retorno, reg.saida);
+    document.getElementById('total-section').style.display = 'block';
+    document.getElementById('total-horas').textContent = minToHM(total);
+  }
+}
+
+function resetar() {
+  if (!confirm('Reiniciar todos os registros do dia?')) return;
+  estado = { passo: 0, registros: {} };
+  document.getElementById('registros-section').style.display = 'none';
+  document.getElementById('total-section').style.display = 'none';
+  document.getElementById('btn-ponto').disabled = false;
+  renderBotao();
+  setStatus('Pronto para registrar a entrada.', 'status-default');
+}
+
+setInterval(tick, 1000);
+tick();
+</script>
+</body>
+</html>
